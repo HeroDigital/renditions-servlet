@@ -12,6 +12,12 @@ Supported Extensions: jpg, jpeg, png
 
 Supported Rendition Type Selectors: imgw, imgt
 
+Rendition Search Priority:
+
+0. Rendition must have matching dimensions
+1. Closest matching rendition type (web, thumbnail)
+2. Closest matching rendition extension (png, jpeg)
+
 ## Examples
 
 ```
