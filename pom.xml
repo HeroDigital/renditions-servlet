@@ -5,7 +5,7 @@
 
     <groupId>com.herodigital.wcm</groupId>
     <artifactId>renditions-servlet</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <name>Renditions Servlet</name>
