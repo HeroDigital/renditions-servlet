@@ -9,6 +9,7 @@ servlet which can be used to request DAM image renditions in a prioritized manne
 ## Documentaton
 
 Supported Extensions: jpg, jpeg, png
+
 Supported Rendition Type Selectors: imgw, imgt
 
 ```
