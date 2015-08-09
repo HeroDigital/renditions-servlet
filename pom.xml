@@ -27,7 +27,7 @@
     <scm>
         <connection>scm:git:ssh://git@bitbucket.org/herodigital-ondemand/renditions-servlet.git</connection>
         <developerConnection>scm:git:ssh://git@bitbucket.org/herodigital-ondemand/renditions-servlet.git</developerConnection>
-        <url>https://bitbucket.org/herodigital-ondemand/sling-rest.git</url>
+        <url>https://bitbucket.org/herodigital-ondemand/renditions-servlet.git</url>
         <tag>renditions-servlet-1.0.0</tag>
     </scm>
 
