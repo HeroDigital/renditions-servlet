@@ -17,6 +17,7 @@ OR
 /content/dam/path/to/image/example.imgw.1920.1080.jpeg
 ```
 This will query for a DAM rendition in the following search order:
+
 1. cq5dam.web.1920.1080.jpeg
 2. cq5dam.web.1920.1080.png
 3. cq5dam.thumbnail.1920.1080.jpeg
@@ -27,6 +28,7 @@ This will query for a DAM rendition in the following search order:
 /content/dam/path/to/image/example.imgt.1920.1080.png
 ```
 This will query for a DAM rendition in the following search order:
+
 1. cq5dam.thumbnail.1920.1080.png
 2. cq5dam.thumbnail.1920.1080.jpeg
 3. cq5dam.web.1920.1080.png
