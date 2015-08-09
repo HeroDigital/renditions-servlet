@@ -12,6 +12,8 @@ Supported Extensions: jpg, jpeg, png
 
 Supported Rendition Type Selectors: imgw, imgt
 
+## Examples
+
 ```
 /content/dam/path/to/image/example.imgw.1920.1080.jpg
 OR
