@@ -10,7 +10,11 @@ servlet which can be used to request DAM image renditions in a prioritized manne
 
 Supported Extensions: jpg, jpeg, png
 
-Supported Rendition Type Selectors: imgw, imgt
+Supported Rendition Type Selectors: imgw, imgt, imgo
+
+* imgw = web rendition
+* imgt = thumbnail rendition
+* imgo = original raw image
 
 Rendition Search Priority:
 
@@ -43,3 +47,11 @@ This will query for a DAM rendition in the following search order:
 3. cq5dam.web.1920.1080.png
 4. cq5dam.web.1920.1080.jpeg
 5. 404 response
+
+```
+/content/dam/path/to/image/example.imgo.png
+```
+This will query for the original DAM rendition in the following search order:
+
+1. original
+2. 404 response
