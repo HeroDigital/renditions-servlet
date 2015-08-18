@@ -32,6 +32,9 @@ public class AssetRenditionResolverImpl implements AssetRenditionResolver {
 	 * <li>Rendition extension (eg. png, jpeg)</li>
 	 * </ol>
 	 * First match is returned. Requested dimensions are always honored.
+	 * <p>
+	 * {@link RenditionType#ORIGINAL} is a special case which will always result in the "original"
+	 * returned, or null if missing. No extra search rules are used.
 	 */
 	@Override
 	public Rendition resolveRendition(Asset asset, RenditionMeta renditionMeta) {
@@ -85,8 +88,19 @@ public class AssetRenditionResolverImpl implements AssetRenditionResolver {
 		return renditions;
 	}
 	
+	/**
+	 * Builds list of rendition types with {@code preference} as the first item.
+	 * <p>
+	 * {@link RenditionType#ORIGINAL} is special and is excluded from the result when it
+	 * is not the {code preference}. When it is the {@code preference} it is the only item returned.
+	 * 
+	 * @param preference
+	 * @return
+	 */
 	private List<RenditionType> buildSortedRenditionTypes(final RenditionType preference) {
-		List<RenditionType> list = Arrays.asList(RenditionType.values());
+		if (preference == RenditionType.ORIGINAL) return Arrays.asList(preference);
+		
+		List<RenditionType> list = RenditionType.getNonOriginalRenditionTypes();
 		Collections.sort(list, new Comparator<RenditionType>() {
 			public int compare(RenditionType o1, RenditionType o2) {
 				if (preference == o1) return -1;

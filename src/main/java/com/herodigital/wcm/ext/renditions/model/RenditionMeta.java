@@ -1,5 +1,11 @@
 package com.herodigital.wcm.ext.renditions.model;
 
+/**
+ * Descriptor of all rendition facets needed when requesting a DAM image rendition. 
+ * 
+ * @author joelepps
+ *
+ */
 public class RenditionMeta {
 	
 	private final RenditionType type;

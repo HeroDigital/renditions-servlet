@@ -29,7 +29,7 @@ import com.herodigital.wcm.ext.renditions.service.AssetRenditionResolver;
 
 /**
  * Handles fetching of an asset image rendition. Primary advantage over out of the box AEM
- * thumbnail servlet is the support of both web and thumbnail renditions.
+ * thumbnail servlet is the support of both web, thumbnail, and original renditions.
  * <p>
  * Resolution of rendition is handled by {@link AssetRenditionResolver}.
  * <p>
@@ -51,7 +51,7 @@ import com.herodigital.wcm.ext.renditions.service.AssetRenditionResolver;
 })
 public class ImageRenditionServlet extends SlingSafeMethodsServlet {
 
-private static final long serialVersionUID = 7272927969196706776L;
+	private static final long serialVersionUID = 7272927969196706776L;
 	
 	private static final Logger log = LoggerFactory.getLogger(ImageRenditionServlet.class);
 	
@@ -59,7 +59,7 @@ private static final long serialVersionUID = 7272927969196706776L;
 	protected static final String SELECTOR_RENDITION_THUMB = "imgt";
 	protected static final String SELECTOR_RENDITION_ORIGINAL ="imgo";
 	
-	private static enum Selector { TYPE, WIDTH, HEIGHT }
+	private static enum Selector { TYPE, WIDTH, HEIGHT } // used for ordinal position of selectors
 	
 	@Reference
 	private AssetRenditionResolver assetRenditionResolver;
