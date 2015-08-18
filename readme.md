@@ -6,6 +6,8 @@ Hero Digital Rendition Servlet
 AEM comes with two kinds of image renditions for DAM assets (web and thumbnail). This bundle provides a single
 servlet which can be used to request DAM image renditions in a prioritized manner.
 
+Special "original" rendition can also be retrieved. However, it is only returned if specifically asked for and is not included in normal rendition resolution.
+
 ## Documentaton
 
 Supported Extensions: jpg, jpeg, png
