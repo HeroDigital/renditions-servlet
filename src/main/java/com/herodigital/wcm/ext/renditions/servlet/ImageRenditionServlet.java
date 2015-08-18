@@ -111,7 +111,7 @@ private static final long serialVersionUID = 7272927969196706776L;
 		RenditionSelector renditionSelector = null;
 		int width = 0;
 		int height = 0;
-		if (selectors.length >= 1 && selectors[0] == SELECTOR_RENDITION_ORIGINAL) {
+		if (selectors.length >= 1 && SELECTOR_RENDITION_ORIGINAL.equals(selectors[0])) {
 			// original rendition does not need or parse width/height
 			renditionSelector = RenditionSelector.fromSelector(selectors[Selector.TYPE.ordinal()]);
 		} else if (selectors.length == 3) {
