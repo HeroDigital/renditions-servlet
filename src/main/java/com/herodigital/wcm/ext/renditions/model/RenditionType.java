@@ -1,7 +1,7 @@
 package com.herodigital.wcm.ext.renditions.model;
 
 public enum RenditionType {
-	WEB("web"), THUMBNAIL("thumbnail");
+	WEB("web"), THUMBNAIL("thumbnail"), ORIGINAL("original");
 	
 	private final String name;
 	

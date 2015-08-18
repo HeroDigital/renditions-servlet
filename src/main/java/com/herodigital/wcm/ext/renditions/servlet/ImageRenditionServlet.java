@@ -40,7 +40,7 @@ import com.herodigital.wcm.ext.renditions.service.AssetRenditionResolver;
  */
 @SlingServlet(
 		resourceTypes = "sling/servlet/default",
-		selectors = { ImageRenditionServlet.SELECTOR_RENDITION_WEB, ImageRenditionServlet.SELECTOR_RENDITION_THUMB }, 
+		selectors = { ImageRenditionServlet.SELECTOR_RENDITION_WEB, ImageRenditionServlet.SELECTOR_RENDITION_THUMB, ImageRenditionServlet.SELECTOR_RENDITION_ORIGINAL }, 
 		extensions = { "png", "jpg", "jpeg" }, 
 		methods = { "GET" }, 
 		label = "Web Image Rendition Servlet", 
@@ -57,6 +57,7 @@ private static final long serialVersionUID = 7272927969196706776L;
 	
 	protected static final String SELECTOR_RENDITION_WEB = "imgw";
 	protected static final String SELECTOR_RENDITION_THUMB = "imgt";
+	protected static final String SELECTOR_RENDITION_ORIGINAL ="imgo";
 	
 	private static enum Selector { TYPE, WIDTH, HEIGHT }
 	
@@ -107,8 +108,18 @@ private static final long serialVersionUID = 7272927969196706776L;
 		String[] selectors = request.getRequestPathInfo().getSelectors();
 		String extension = request.getRequestPathInfo().getExtension();
 		
-		if (selectors.length != 3) {
-			log.debug("Selectors size is not 3: {}", Arrays.toString(selectors));
+		RenditionSelector renditionSelector = null;
+		int width = 0;
+		int height = 0;
+		if (selectors.length >= 1 && SELECTOR_RENDITION_ORIGINAL.equals(selectors[0])) {
+			// original rendition does not need or parse width/height
+			renditionSelector = RenditionSelector.fromSelector(selectors[Selector.TYPE.ordinal()]);
+		} else if (selectors.length == 3) {
+			renditionSelector = RenditionSelector.fromSelector(selectors[Selector.TYPE.ordinal()]);
+			width = NumberUtils.toInt(selectors[Selector.WIDTH.ordinal()]);
+			height = NumberUtils.toInt(selectors[Selector.HEIGHT.ordinal()]);
+		} else {
+			log.debug("Selectors size is not 1 or 3: {}", Arrays.toString(selectors));
 			return null;
 		}
 		
@@ -116,10 +127,6 @@ private static final long serialVersionUID = 7272927969196706776L;
 			log.trace("Updating extension jpg to jpeg");
 			extension = "jpeg";
 		}
-		
-		RenditionSelector renditionSelector = RenditionSelector.fromSelector(selectors[Selector.TYPE.ordinal()]);
-		int width = NumberUtils.toInt(selectors[Selector.WIDTH.ordinal()]);
-		int height = NumberUtils.toInt(selectors[Selector.HEIGHT.ordinal()]);
 		
 		if (renditionSelector == null) {
 			log.debug("Rendition type was not recognized: {}", Arrays.toString(selectors));

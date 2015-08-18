@@ -64,18 +64,22 @@ public class AssetRenditionResolverImpl implements AssetRenditionResolver {
 		List<String> sortedExtensions = buildSortedExtensions(renditionMeta.getExtension());
 		
 		for (RenditionType renditionType : sortedTypes) {
-			for (String extension : sortedExtensions) {
-				StringBuilder sb = new StringBuilder();
-				// cq5dam.web.1920.1080.png
-				sb.append("cq5dam.")
-					.append(renditionType.getName())
-					.append(".")
-					.append(renditionMeta.getWidth())
-					.append(".")
-					.append(renditionMeta.getHeight())
-					.append(".")
-					.append(extension);
-				renditions.add(sb.toString());
+			if (RenditionType.ORIGINAL == renditionType) {
+				renditions.add(RenditionType.ORIGINAL.getName());
+			} else {
+				for (String extension : sortedExtensions) {
+					StringBuilder sb = new StringBuilder();
+					// cq5dam.web.1920.1080.png
+					sb.append("cq5dam.")
+						.append(renditionType.getName())
+						.append(".")
+						.append(renditionMeta.getWidth())
+						.append(".")
+						.append(renditionMeta.getHeight())
+						.append(".")
+						.append(extension);
+					renditions.add(sb.toString());
+				}
 			}
 		}
 		return renditions;

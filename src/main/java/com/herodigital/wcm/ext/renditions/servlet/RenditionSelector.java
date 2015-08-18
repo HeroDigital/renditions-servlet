@@ -11,7 +11,8 @@ import com.herodigital.wcm.ext.renditions.model.RenditionType;
  */
 enum RenditionSelector {
 	IMG(ImageRenditionServlet.SELECTOR_RENDITION_WEB, RenditionType.WEB),
-	THUMBNAIL(ImageRenditionServlet.SELECTOR_RENDITION_THUMB, RenditionType.THUMBNAIL);
+	THUMBNAIL(ImageRenditionServlet.SELECTOR_RENDITION_THUMB, RenditionType.THUMBNAIL),
+	ORIGINAL(ImageRenditionServlet.SELECTOR_RENDITION_ORIGINAL, RenditionType.ORIGINAL);
 	
 	private final String selector;
 	private final RenditionType renditionType;
