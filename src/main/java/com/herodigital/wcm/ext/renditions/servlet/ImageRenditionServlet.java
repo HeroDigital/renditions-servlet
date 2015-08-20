@@ -8,6 +8,7 @@ import java.util.Arrays;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.math.NumberUtils;
@@ -138,13 +139,34 @@ public class ImageRenditionServlet extends SlingSafeMethodsServlet {
 		
 		return meta;
 	}
-	
+
 	private static void writeResponse(SlingHttpServletResponse response, InputStream input, String mimeType) throws IOException {
+		if (mimeType.contains("svg")) {
+			writeSvg(response, input);
+		} else {
+			writeBinaryImage(response, input, mimeType);
+		}
+	}
+	
+	private static void writeBinaryImage(SlingHttpServletResponse response, InputStream input, String mimeType) throws IOException {
 		String formatName = mimeType.contains("png") ? "PNG" : "JPG";
 		response.setContentType(mimeType);
 		BufferedImage bi = ImageIO.read(input);
 		OutputStream out = response.getOutputStream();
 		ImageIO.write(bi, formatName, out);
+		out.close();
+	}
+	
+	private static void writeSvg(SlingHttpServletResponse response, InputStream input) throws IOException {
+		response.setContentType("image/svg+xml");
+		ServletOutputStream out = response.getOutputStream();
+		byte[] buffer = new byte[1024];
+		int len = input.read(buffer);
+		while (len != -1) {
+		    out.write(buffer, 0, len);
+		    len = input.read(buffer);
+		}
+		input.close();
 		out.close();
 	}
 
