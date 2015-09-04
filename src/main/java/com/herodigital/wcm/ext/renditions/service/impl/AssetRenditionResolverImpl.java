@@ -56,7 +56,7 @@ public class AssetRenditionResolverImpl implements AssetRenditionResolver {
 		}
 		
 		if (log.isDebugEnabled()) {
-			log.debug("Resolved rendition {} for {} and {}", rendition.getName(), asset.getPath(), renditionMeta);
+			log.debug("Resolved rendition {} for {} and {}", (rendition == null) ? "null" : rendition.getName(), asset.getPath(), renditionMeta);
 		}
 		return rendition;
 	}
@@ -112,7 +112,8 @@ public class AssetRenditionResolverImpl implements AssetRenditionResolver {
 	}
 	
 	private List<String> buildSortedExtensions(final String preference) {
-		List<String> list = Arrays.asList(RENDITION_EXTENSIONS);
+		// protect against changes to RENDITION_EXTENSIONS
+		List<String> list = new ArrayList<>(Arrays.asList(RENDITION_EXTENSIONS));
 		Collections.sort(list, new Comparator<String>() {
 			public int compare(String o1, String o2) {
 				if (preference.equals(o1)) return -1;
