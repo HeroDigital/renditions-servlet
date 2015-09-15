@@ -36,9 +36,9 @@ OR
 This will query for a DAM rendition in the following search order:
 
 1. cq5dam.web.1920.1080.jpeg
-2. cq5dam.web.1920.1080.png
+2. cq5dam.web.1920.1080.png (redirect to .jpg)
 3. cq5dam.thumbnail.1920.1080.jpeg
-4. cq5dam.thumbnail.1920.1080.png
+4. cq5dam.thumbnail.1920.1080.png (redirect to .jpg)
 5. 404 response
 
 ```
@@ -47,9 +47,9 @@ This will query for a DAM rendition in the following search order:
 This will query for a DAM rendition in the following search order:
 
 1. cq5dam.thumbnail.1920.1080.png
-2. cq5dam.thumbnail.1920.1080.jpeg
+2. cq5dam.thumbnail.1920.1080.jpeg (redirect to .png)
 3. cq5dam.web.1920.1080.png
-4. cq5dam.web.1920.1080.jpeg
+4. cq5dam.web.1920.1080.jpeg (redirect to .png)
 5. 404 response
 
 ```
