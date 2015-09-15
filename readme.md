@@ -24,6 +24,8 @@ Rendition Search Priority:
 1. Closest matching rendition type (web, thumbnail)
 2. Closest matching rendition extension (png, jpeg)
 
+*If the resolved rendition mime type does not match the request extension, a 302 redirect is returned to a URL with the matching extension.*
+
 ## Examples
 
 ```
