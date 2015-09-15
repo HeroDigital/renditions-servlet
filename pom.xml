@@ -5,7 +5,7 @@
 
     <groupId>com.herodigital.wcm</groupId>
     <artifactId>renditions-servlet</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.2</version>
     <packaging>bundle</packaging>
 
     <name>Renditions Servlet</name>
@@ -28,7 +28,7 @@
         <connection>scm:git:ssh://git@bitbucket.org/herodigital-ondemand/renditions-servlet.git</connection>
         <developerConnection>scm:git:ssh://git@bitbucket.org/herodigital-ondemand/renditions-servlet.git</developerConnection>
         <url>https://bitbucket.org/herodigital-ondemand/renditions-servlet.git</url>
-        <tag>renditions-servlet-1.0.1</tag>
+        <tag>renditions-servlet-1.0.2</tag>
     </scm>
 
     <distributionManagement>
