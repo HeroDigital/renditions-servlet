@@ -42,7 +42,7 @@ import com.herodigital.wcm.ext.renditions.service.AssetRenditionResolver;
 @SlingServlet(
 		resourceTypes = "sling/servlet/default",
 		selectors = { ImageRenditionServlet.SELECTOR_RENDITION_WEB, ImageRenditionServlet.SELECTOR_RENDITION_THUMB, ImageRenditionServlet.SELECTOR_RENDITION_ORIGINAL }, 
-		extensions = { "png", "jpg", "jpeg" }, 
+		extensions = { "png", "jpg", "jpeg", "svg" }, 
 		methods = { "GET" }, 
 		label = "Web Image Rendition Servlet", 
 		description = "Servlet which returns the web image rendition")
@@ -67,6 +67,7 @@ public class ImageRenditionServlet extends SlingSafeMethodsServlet {
 	
 	@Override
 	protected void doGet(SlingHttpServletRequest request, SlingHttpServletResponse response) throws ServletException, IOException {
+		// Convert request to convenience object
 		RenditionMeta renditionMeta = buildRenditionMeta(request);
 		if (renditionMeta == null) {
 			log.debug("Failed to build rendition meta for {}", request.getPathInfo());
@@ -74,6 +75,7 @@ public class ImageRenditionServlet extends SlingSafeMethodsServlet {
 			return;
 		}
 		
+		// Resolve image resource
 		Resource resource = request.getResource();
 		if (resource == null) {
 			log.debug("Missing dam asset at {}", request.getPathInfo());
@@ -81,6 +83,7 @@ public class ImageRenditionServlet extends SlingSafeMethodsServlet {
 			return;
 		}
 		
+		// Adapt image resource to dam object
 		Asset damAsset = resource.adaptTo(Asset.class);
 		if (damAsset == null) {
 			log.debug("Cannot resolve dam asset at {} for {}", resource.getPath(), request.getPathInfo());
@@ -88,6 +91,7 @@ public class ImageRenditionServlet extends SlingSafeMethodsServlet {
 			return;
 		}
 		
+		// Resolve dam asset + meta data to actual rendition
 		Rendition rendition = assetRenditionResolver.resolveRendition(damAsset, renditionMeta);
 		if (rendition == null) {
 			log.debug("Missing rendition for {} and {}", renditionMeta, damAsset.getPath());
@@ -95,6 +99,13 @@ public class ImageRenditionServlet extends SlingSafeMethodsServlet {
 			return;
 		}
 		
+		// If extension does not match rendition mime type, redirect
+		if (!rendition.getMimeType().contains(renditionMeta.getExtension())) {
+			sendRedirectToProperExtension(request, response, rendition, renditionMeta);
+			return;
+		}
+		
+		// Handle potential error
 		InputStream input = rendition.getStream();
 		if (input == null) {
 			log.error("Missing rendition input stream for {} and {}", renditionMeta, damAsset.getPath());
@@ -150,7 +161,11 @@ public class ImageRenditionServlet extends SlingSafeMethodsServlet {
 	
 	private static void writeBinaryImage(SlingHttpServletResponse response, InputStream input, String mimeType) throws IOException {
 		String formatName = mimeType.contains("png") ? "PNG" : "JPG";
+		
+		// NOTE: THIS DOES NOT MATTER WITH DISPATCHER IN PLACE
+		// Dispatcher will use extension of file, it does not save http header
 		response.setContentType(mimeType);
+		
 		BufferedImage bi = ImageIO.read(input);
 		OutputStream out = response.getOutputStream();
 		ImageIO.write(bi, formatName, out);
@@ -168,6 +183,30 @@ public class ImageRenditionServlet extends SlingSafeMethodsServlet {
 		}
 		input.close();
 		out.close();
+	}
+	
+	private static void sendRedirectToProperExtension(SlingHttpServletRequest request, SlingHttpServletResponse response, Rendition rendition, RenditionMeta renditionMeta) throws IOException {
+		String requestURL = request.getRequestURL().toString();
+		String requestExt = request.getRequestPathInfo().getExtension();
+		String newExt = getExtension(rendition.getMimeType());
+		String redirect = requestURL;
+		redirect = redirect.replaceAll(requestExt+"$", newExt);
+		
+		log.warn("Requested {}, however, mime type of rendition is {}. Redirecting to {}", requestURL, rendition.getMimeType(), redirect);
+		response.sendRedirect(redirect);
+	}
+	
+	private static String getExtension(String mimeType) {
+		if (mimeType != null && mimeType.contains("png")) {
+            return "png";
+        } else if (mimeType != null && mimeType.contains("jpeg")) {
+            return "jpg";
+        } else if (mimeType != null && mimeType.contains("svg")) {
+            return "svg";
+        } else {
+        	log.warn("Unsupported mime type of {}", mimeType);
+            return "jpg"; // default
+        }
 	}
 
 }
