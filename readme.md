@@ -1,5 +1,5 @@
 Hero Digital Rendition Servlet
-===================================
+==============================
 
 ## Background
 
@@ -24,9 +24,15 @@ Rendition Search Priority:
 1. Closest matching rendition type (web, thumbnail)
 2. Closest matching rendition extension (png, jpeg)
 
-*If the resolved rendition mime type does not match the request extension, a 302 redirect is returned to a URL with the matching extension.*
+## Configuration
+
+`rendition.servlet.redirect.on.wrong.type`: Enabled by default. If request is made to a rendition with the wrong extension, a 302 redirect is returned the the URL with the matching extension. If disabled, then 415 error response is returned.
+
+`rendition.servlet.redirect.on.missing.rendition`: Disabled by default. If requested rendition is not found, 404 error response is returned. If enabled, 302 redirect is returned to the original rendition.
 
 ## Examples
+
+All examples are based on default configuration.
 
 ```
 /content/dam/path/to/image/example.imgw.1920.1080.jpg

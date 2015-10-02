@@ -5,21 +5,27 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.Dictionary;
 
 import javax.imageio.ImageIO;
+import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.felix.scr.annotations.Activate;
+import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Reference;
-import org.apache.felix.scr.annotations.sling.SlingServlet;
+import org.apache.felix.scr.annotations.Service;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.servlets.SlingSafeMethodsServlet;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,21 +40,20 @@ import com.herodigital.wcm.ext.renditions.service.AssetRenditionResolver;
  * <p>
  * Resolution of rendition is handled by {@link AssetRenditionResolver}.
  * <p>
- * 404 response is returned if requested asset or rendition does not exist.
+ * 404 response may be returned if requested asset or rendition does not exist (depending on configuration).
  * 
  * @author joelepps
  *
  */
-@SlingServlet(
-		resourceTypes = "sling/servlet/default",
-		selectors = { ImageRenditionServlet.SELECTOR_RENDITION_WEB, ImageRenditionServlet.SELECTOR_RENDITION_THUMB, ImageRenditionServlet.SELECTOR_RENDITION_ORIGINAL }, 
-		extensions = { "png", "jpg", "jpeg", "svg" }, 
-		methods = { "GET" }, 
-		label = "Web Image Rendition Servlet", 
-		description = "Servlet which returns the web image rendition")
+@Component(metatype=true, immediate=true, label="Web Image Rendition Servlet", description="Servlet which returns the web image rendition")
+@Service(Servlet.class)
 @Properties({
 		@Property(name = "service.description", value = "Servlet which returns the web image rendtions"),
-		@Property(name = "service.vendor", value = "Hero Digital") 
+		@Property(name = "service.vendor", value = "Hero Digital"),
+		@Property(name = "sling.servlet.resourceTypes", value="sling/servlet/default", propertyPrivate=true),
+		@Property(name = "sling.servlet.selectors", value={ImageRenditionServlet.SELECTOR_RENDITION_WEB, ImageRenditionServlet.SELECTOR_RENDITION_THUMB, ImageRenditionServlet.SELECTOR_RENDITION_ORIGINAL }, propertyPrivate=true),
+		@Property(name = "sling.servlet.extensions", value={ "png", "jpg", "jpeg", "svg" }, propertyPrivate=true),
+		@Property(name = "sling.servlet.methods", value={ "GET" }, propertyPrivate=true),
 })
 public class ImageRenditionServlet extends SlingSafeMethodsServlet {
 
@@ -58,12 +63,28 @@ public class ImageRenditionServlet extends SlingSafeMethodsServlet {
 	
 	protected static final String SELECTOR_RENDITION_WEB = "imgw";
 	protected static final String SELECTOR_RENDITION_THUMB = "imgt";
-	protected static final String SELECTOR_RENDITION_ORIGINAL ="imgo";
+	protected static final String SELECTOR_RENDITION_ORIGINAL = "imgo";
 	
 	private static enum Selector { TYPE, WIDTH, HEIGHT } // used for ordinal position of selectors
 	
+	@Property(label = "Redirect On Unsupported Type", description = "Enabled by default. If request is made to a rendition with the wrong extension, a 302 redirect is returned the the URL with the matching extension. If disabled, then 415 error response is returned.", boolValue = true)
+	public static final String REDIRECT_ON_WRONG_TYPE = "rendition.servlet.redirect.on.wrong.type";
+	private boolean redirectOnWrongType;
+	
+	@Property(label = "Redirect On Missing Rendition", description = "Disabled by default. If requested rendition is not found, 404 error response is returned. If enabled, 302 redirect is returned to the original rendition.", boolValue = false)
+	public static final String REDIRECT_ON_MISSING_RENDITION = "rendition.servlet.redirect.on.missing.rendition";
+	private boolean redirectOnMissingRendition;
+	
 	@Reference
 	private AssetRenditionResolver assetRenditionResolver;
+	
+	@Activate
+	@SuppressWarnings("unchecked")
+	public void activate(ComponentContext context) {
+		Dictionary<String, ?> properties = context.getProperties();
+		redirectOnWrongType = toBoolean(properties.get(REDIRECT_ON_WRONG_TYPE));
+		redirectOnMissingRendition = toBoolean(properties.get(REDIRECT_ON_MISSING_RENDITION));
+	}
 	
 	@Override
 	protected void doGet(SlingHttpServletRequest request, SlingHttpServletResponse response) throws ServletException, IOException {
@@ -94,15 +115,26 @@ public class ImageRenditionServlet extends SlingSafeMethodsServlet {
 		// Resolve dam asset + meta data to actual rendition
 		Rendition rendition = assetRenditionResolver.resolveRendition(damAsset, renditionMeta);
 		if (rendition == null) {
-			log.debug("Missing rendition for {} and {}", renditionMeta, damAsset.getPath());
-			response.sendError(HttpServletResponse.SC_NOT_FOUND);
-			return;
+			if (redirectOnMissingRendition) {
+				sendRedirectToOriginalRendition(request, response, damAsset);
+				return;
+			} else {
+				log.debug("Missing rendition for {} and {}", renditionMeta, damAsset.getPath());
+				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+				return;
+			}
 		}
 		
-		// If extension does not match rendition mime type, redirect
+		// If extension does not match rendition mime type, redirect or 415 error
 		if (!rendition.getMimeType().contains(renditionMeta.getExtension())) {
-			sendRedirectToProperExtension(request, response, rendition, renditionMeta);
-			return;
+			if (redirectOnWrongType) {
+				sendRedirectToProperExtension(request, response, rendition, renditionMeta);
+				return;
+			} else {
+				log.debug("Wrong extension for {} and request {}", rendition.getMimeType(), renditionMeta.getExtension());
+				response.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+				return;
+			}
 		}
 		
 		// Handle potential error
@@ -185,6 +217,16 @@ public class ImageRenditionServlet extends SlingSafeMethodsServlet {
 		out.close();
 	}
 	
+	private static void sendRedirectToOriginalRendition(SlingHttpServletRequest request, SlingHttpServletResponse response, Asset asset) throws IOException {
+		String requestURL = request.getRequestURL().toString();
+		String path = asset.getPath();
+		String ext = getExtension(asset.getMimeType());
+		String redirect = path + "." + SELECTOR_RENDITION_ORIGINAL + "." + ext;
+		
+		log.warn("Requested {}, however, rendition not found. Redirecting to {}", requestURL, redirect);
+		response.sendRedirect(redirect);
+	}
+	
 	private static void sendRedirectToProperExtension(SlingHttpServletRequest request, SlingHttpServletResponse response, Rendition rendition, RenditionMeta renditionMeta) throws IOException {
 		String requestURL = request.getRequestURL().toString();
 		String requestExt = request.getRequestPathInfo().getExtension();
@@ -207,6 +249,12 @@ public class ImageRenditionServlet extends SlingSafeMethodsServlet {
         	log.warn("Unsupported mime type of {}", mimeType);
             return "jpg"; // default
         }
+	}
+	
+	private static boolean toBoolean(Object obj) {
+		if (obj == null) return false;
+		if (obj instanceof Boolean) return (Boolean) obj;
+		return BooleanUtils.toBoolean(obj.toString());
 	}
 
 }
