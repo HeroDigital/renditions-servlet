@@ -1,4 +1,4 @@
-Hero Digital Rendition Servlet
+AEM Renditions Servlet
 ==============================
 
 ## Background
