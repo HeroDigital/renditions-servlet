@@ -8,7 +8,7 @@
     <version>1.0.3-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
-    <name>Renditions Servlet</name>
+    <name>AEM Renditions Servlet</name>
 
     <description>Servlet for DAM asset renditions.</description>
 
@@ -25,10 +25,9 @@
     </properties>
     
     <scm>
-        <connection>scm:git:ssh://git@bitbucket.org/herodigital-ondemand/renditions-servlet.git</connection>
-        <developerConnection>scm:git:ssh://git@bitbucket.org/herodigital-ondemand/renditions-servlet.git</developerConnection>
-        <url>https://bitbucket.org/herodigital-ondemand/renditions-servlet.git</url>
-        <tag>renditions-servlet-1.0.1</tag>
+        <connection>scm:git:ssh://git@github.com:HeroDigital/renditions-servlet.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com:HeroDigital/renditions-servlet.git</developerConnection>
+        <url>https://github.com/HeroDigital/renditions-servlet</url>
     </scm>
 
     <distributionManagement>
