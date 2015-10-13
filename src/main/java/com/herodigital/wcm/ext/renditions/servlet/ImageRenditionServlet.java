@@ -52,7 +52,7 @@ import com.herodigital.wcm.ext.renditions.service.AssetRenditionResolver;
 		@Property(name = "service.vendor", value = "Hero Digital"),
 		@Property(name = "sling.servlet.resourceTypes", value="sling/servlet/default", propertyPrivate=true),
 		@Property(name = "sling.servlet.selectors", value={ImageRenditionServlet.SELECTOR_RENDITION_WEB, ImageRenditionServlet.SELECTOR_RENDITION_THUMB, ImageRenditionServlet.SELECTOR_RENDITION_ORIGINAL }, propertyPrivate=true),
-		@Property(name = "sling.servlet.extensions", value={ "png", "jpg", "jpeg", "svg" }, propertyPrivate=true),
+		@Property(name = "sling.servlet.extensions", value={ "png", "jpg", "jpeg", "svg", "gif" }, propertyPrivate=true),
 		@Property(name = "sling.servlet.methods", value={ "GET" }, propertyPrivate=true),
 })
 public class ImageRenditionServlet extends SlingSafeMethodsServlet {
@@ -192,9 +192,11 @@ public class ImageRenditionServlet extends SlingSafeMethodsServlet {
 	}
 	
 	private static void writeBinaryImage(SlingHttpServletResponse response, InputStream input, String mimeType) throws IOException {
-		String formatName = mimeType.contains("png") ? "PNG" : "JPG";
+		String formatName = "JPG";
+		if (mimeType.contains("png")) formatName = "PNG";
+		if (mimeType.contains("gif")) formatName = "GIF";
 		
-		// NOTE: THIS DOES NOT MATTER WITH DISPATCHER IN PLACE
+		// NOTE: THIS DOES NOT MATTER WHEN DISPATCHER IS IN PLACE
 		// Dispatcher will use extension of file, it does not save http header
 		response.setContentType(mimeType);
 		
@@ -238,16 +240,17 @@ public class ImageRenditionServlet extends SlingSafeMethodsServlet {
 		response.sendRedirect(redirect);
 	}
 	
-	private static String getExtension(String mimeType) {
+	private static String getExtension(String mimeType) throws IOException {
 		if (mimeType != null && mimeType.contains("png")) {
             return "png";
         } else if (mimeType != null && mimeType.contains("jpeg")) {
             return "jpg";
         } else if (mimeType != null && mimeType.contains("svg")) {
             return "svg";
+        } else if (mimeType != null && mimeType.contains("gif")) {
+        	return "gif";
         } else {
-        	log.warn("Unsupported mime type of {}", mimeType);
-            return "jpg"; // default
+        	throw new IOException("Unsupported mime type " + mimeType);
         }
 	}
 	
