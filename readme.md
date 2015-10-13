@@ -54,6 +54,8 @@ Right selector, right extension, right dimensions.
 /content/dam/path/to/image/example.png.imgw.1280.1280.jpg
 ```
 
+**Result**
+
 200 Response. 
 
 Underlying image is `/content/dam/path/to/image/example.png/jcr:content/renditions/cq5dam.web.1280.1280.jpeg`.
@@ -69,6 +71,8 @@ Wrong selector, wrong extension, wrong dimensions.
 ```
 /content/dam/path/to/image/example.png.imgt.1281.1281.gif
 ```
+
+**Result**
 
 302 redirect to `/content/dam/path/to/image/example.png.imgo.png`.
 
@@ -86,6 +90,8 @@ Wrong selector, wrong extension, right dimensions.
 /content/dam/path/to/image/example.png.imgt.1280.1280.gif
 ```
 
+**Result**
+
 302 redirect to `/content/dam/path/to/image/example.png.imgt.1280.1280.jpg`.
 
 Underlying image is `/content/dam/path/to/image/example.png/jcr:content/renditions/cq5dam.web.1280.1280.jpeg`.
@@ -102,6 +108,8 @@ Wrong selector, right extension, right dimensions.
 ```
 /content/dam/path/to/image/example.png.imgt.1280.1280.jpg
 ```
+
+**Result**
 
 200 response. However, underlying search order will check for a 1280x1280 thumbnail rendition first, before using the web rendition.
 
