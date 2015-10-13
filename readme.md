@@ -6,17 +6,23 @@ AEM Renditions Servlet
 AEM comes with two kinds of image renditions for DAM assets (web and thumbnail). This bundle provides a single
 servlet which can be used to request DAM image renditions in a prioritized manner.
 
-Special "original" rendition can also be retrieved. However, it is only returned if specifically asked for and is not included in normal rendition resolution.
+Special "original" rendition can also be retrieved. However, it is only returned if specifically queried or in the case
+that `rendition.servlet.redirect.on.missing.rendition` functionality is enabled.
 
 ## Documentaton
 
-Supported Extensions: jpg, jpeg, png
+Supported Extensions: jpg, jpeg, png, svg, gif
 
 Supported Rendition Type Selectors: imgw, imgt, imgo
 
 * imgw = web rendition
 * imgt = thumbnail rendition
 * imgo = original raw image
+
+Supported DAM Rendition MIME Types:
+
+* image/jpeg
+* image/png
 
 Rendition Search Priority:
 
@@ -32,36 +38,60 @@ Rendition Search Priority:
 
 ## Examples
 
-All examples are based on default configuration.
+### Image
 
 ```
-/content/dam/path/to/image/example.imgw.1920.1080.jpg
-OR
-/content/dam/path/to/image/example.imgw.1920.1080.jpeg
+/content/dam/path/to/image/example.png/jcr:content/renditions/cq5dam.thumbnail.48.48.png
+/content/dam/path/to/image/example.png/jcr:content/renditions/cq5dam.web.1280.1280.jpeg
+/content/dam/path/to/image/example.png/jcr:content/renditions/original
 ```
-This will query for a DAM rendition in the following search order:
 
-1. cq5dam.web.1920.1080.jpeg
-2. cq5dam.web.1920.1080.png (redirect to .jpg)
-3. cq5dam.thumbnail.1920.1080.jpeg
-4. cq5dam.thumbnail.1920.1080.png (redirect to .jpg)
-5. 404 response
+### Request 1:
+
+Right selector, right extension, right dimensions.
 
 ```
-/content/dam/path/to/image/example.imgt.1920.1080.png
+/content/dam/path/to/image/example.png.imgw.1280.1280.jpg
 ```
-This will query for a DAM rendition in the following search order:
 
-1. cq5dam.thumbnail.1920.1080.png
-2. cq5dam.thumbnail.1920.1080.jpeg (redirect to .png)
-3. cq5dam.web.1920.1080.png
-4. cq5dam.web.1920.1080.jpeg (redirect to .png)
-5. 404 response
+200 Response. 
+Underlying image is `/content/dam/path/to/image/example.png/jcr:content/renditions/cq5dam.web.1280.1280.jpeg`.
+
+### Request 2:
+
+Wrong selector, wrong extension, wrong dimensions.
+`rendition.servlet.redirect.on.wrong.type` = true
+`rendition.servlet.redirect.on.missing.rendition` = true
 
 ```
-/content/dam/path/to/image/example.imgo.png
+/content/dam/path/to/image/example.png.imgt.1281.1281.gif
 ```
-This will query for the original DAM rendition in the following search order:
 
-1. original
-2. 404 response
+302 redirect to `/content/dam/path/to/image/example.png.imgo.png`.
+Underlying image is `/content/dam/path/to/image/example.png/jcr:content/renditions/orignal`.
+
+### Request 3:
+
+Wrong selector, wrong extension, right dimensions.
+`rendition.servlet.redirect.on.wrong.type` = true
+`rendition.servlet.redirect.on.missing.rendition` = true
+
+```
+/content/dam/path/to/image/example.png.imgt.1280.1280.gif
+```
+
+302 redirect to `/content/dam/path/to/image/example.png.imgt.1280.1280.jpg`.
+Underlying image is `/content/dam/path/to/image/example.png/jcr:content/renditions/cq5dam.web.1280.1280.jpeg`.
+
+### Request 4:
+
+Wrong selector, right extension, right dimensions.
+`rendition.servlet.redirect.on.wrong.type` = true
+`rendition.servlet.redirect.on.missing.rendition` = true
+
+```
+/content/dam/path/to/image/example.png.imgt.1280.1280.jpg
+```
+
+200 response. However, underlying search order will check for a 1280x1280 thumbnail rendition first, before using the web rendition.
+Underlying image is `/content/dam/path/to/image/example.png/jcr:content/renditions/cq5dam.web.1280.1280.jpeg`.
