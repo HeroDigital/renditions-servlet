@@ -55,12 +55,15 @@ Right selector, right extension, right dimensions.
 ```
 
 200 Response. 
+
 Underlying image is `/content/dam/path/to/image/example.png/jcr:content/renditions/cq5dam.web.1280.1280.jpeg`.
 
 ### Request 2:
 
 Wrong selector, wrong extension, wrong dimensions.
+
 `rendition.servlet.redirect.on.wrong.type` = true
+
 `rendition.servlet.redirect.on.missing.rendition` = true
 
 ```
@@ -68,12 +71,15 @@ Wrong selector, wrong extension, wrong dimensions.
 ```
 
 302 redirect to `/content/dam/path/to/image/example.png.imgo.png`.
+
 Underlying image is `/content/dam/path/to/image/example.png/jcr:content/renditions/orignal`.
 
 ### Request 3:
 
 Wrong selector, wrong extension, right dimensions.
+
 `rendition.servlet.redirect.on.wrong.type` = true
+
 `rendition.servlet.redirect.on.missing.rendition` = true
 
 ```
@@ -81,17 +87,22 @@ Wrong selector, wrong extension, right dimensions.
 ```
 
 302 redirect to `/content/dam/path/to/image/example.png.imgt.1280.1280.jpg`.
+
 Underlying image is `/content/dam/path/to/image/example.png/jcr:content/renditions/cq5dam.web.1280.1280.jpeg`.
 
 ### Request 4:
 
 Wrong selector, right extension, right dimensions.
+
 `rendition.servlet.redirect.on.wrong.type` = true
+
 `rendition.servlet.redirect.on.missing.rendition` = true
+
 
 ```
 /content/dam/path/to/image/example.png.imgt.1280.1280.jpg
 ```
 
 200 response. However, underlying search order will check for a 1280x1280 thumbnail rendition first, before using the web rendition.
+
 Underlying image is `/content/dam/path/to/image/example.png/jcr:content/renditions/cq5dam.web.1280.1280.jpeg`.
