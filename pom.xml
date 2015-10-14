@@ -151,11 +151,6 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>com.herodigital.wcm.ext.renditions.Activator</Bundle-Activator>
-                        <Import-Package>
-                            com.sun.imageio.*;resolution:=optional,
-                            sun.misc;resolution:=optional,
-                            *
-                        </Import-Package>
                     </instructions>
                 </configuration>
             </plugin>
