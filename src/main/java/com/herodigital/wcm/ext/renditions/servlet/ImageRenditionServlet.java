@@ -145,7 +145,7 @@ public class ImageRenditionServlet extends SlingSafeMethodsServlet {
 		RenditionSelector renditionSelector = null;
 		int width = 0;
 		int height = 0;
-		if (selectors.length >= 1 && SELECTOR_RENDITION_ORIGINAL.equals(selectors[0])) {
+		if (selectors.length >= 1 && SELECTOR_RENDITION_ORIGINAL.equals(selectors[Selector.TYPE.ordinal()])) {
 			// original rendition does not need or parse width/height
 			renditionSelector = RenditionSelector.fromSelector(selectors[Selector.TYPE.ordinal()]);
 		} else if (selectors.length == 3) {
