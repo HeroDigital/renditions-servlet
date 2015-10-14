@@ -1,18 +1,16 @@
 package com.herodigital.wcm.ext.renditions.servlet;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Dictionary;
 
-import javax.imageio.ImageIO;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.felix.scr.annotations.Activate;
@@ -137,15 +135,7 @@ public class ImageRenditionServlet extends SlingSafeMethodsServlet {
 			}
 		}
 		
-		// Handle potential error
-		InputStream input = rendition.getStream();
-		if (input == null) {
-			log.error("Missing rendition input stream for {} and {}", renditionMeta, damAsset.getPath());
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			return;
-		}
-		
-		writeResponse(response, input, rendition.getMimeType());
+		writeResponse(response, rendition);
 	}
 	
 	private static RenditionMeta buildRenditionMeta(SlingHttpServletRequest request) {
@@ -183,40 +173,20 @@ public class ImageRenditionServlet extends SlingSafeMethodsServlet {
 		return meta;
 	}
 
-	private static void writeResponse(SlingHttpServletResponse response, InputStream input, String mimeType) throws IOException {
-		if (mimeType.contains("svg")) {
-			writeSvg(response, input);
-		} else {
-			writeBinaryImage(response, input, mimeType);
+	private static void writeResponse(SlingHttpServletResponse response, Rendition rendition) throws IOException {
+		InputStream inputStream = null;
+		OutputStream outputStream = null;
+		try {
+			inputStream = rendition.getStream();
+			outputStream = response.getOutputStream();
+			
+			response.setContentType(rendition.getMimeType());
+			
+			IOUtils.copy(inputStream, outputStream);
+		} finally {
+			if (inputStream != null) inputStream.close();
+			if (outputStream != null) outputStream.close();
 		}
-	}
-	
-	private static void writeBinaryImage(SlingHttpServletResponse response, InputStream input, String mimeType) throws IOException {
-		String formatName = "JPG";
-		if (mimeType.contains("png")) formatName = "PNG";
-		if (mimeType.contains("gif")) formatName = "GIF";
-		
-		// NOTE: THIS DOES NOT MATTER WHEN DISPATCHER IS IN PLACE
-		// Dispatcher will use extension of file, it does not save http header
-		response.setContentType(mimeType);
-		
-		BufferedImage bi = ImageIO.read(input);
-		OutputStream out = response.getOutputStream();
-		ImageIO.write(bi, formatName, out);
-		out.close();
-	}
-	
-	private static void writeSvg(SlingHttpServletResponse response, InputStream input) throws IOException {
-		response.setContentType("image/svg+xml");
-		ServletOutputStream out = response.getOutputStream();
-		byte[] buffer = new byte[1024];
-		int len = input.read(buffer);
-		while (len != -1) {
-		    out.write(buffer, 0, len);
-		    len = input.read(buffer);
-		}
-		input.close();
-		out.close();
 	}
 	
 	private static void sendRedirectToOriginalRendition(SlingHttpServletRequest request, SlingHttpServletResponse response, Asset asset) throws IOException {
