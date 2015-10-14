@@ -180,6 +180,8 @@ public class ImageRenditionServlet extends SlingSafeMethodsServlet {
 			inputStream = rendition.getStream();
 			outputStream = response.getOutputStream();
 			
+			// NOTE: This does not matter if dispatcher serves image	
+			// Dispatcher will use extension of file, it does not save HTTP Content-Type header
 			response.setContentType(rendition.getMimeType());
 			
 			IOUtils.copy(inputStream, outputStream);
