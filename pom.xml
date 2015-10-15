@@ -25,7 +25,7 @@
     </properties>
     
     <scm>
-        <connection>scm:git:ssh://git@github.com:HeroDigital/renditions-servlet.git</connection>
+        <connection>scm:git:git@github.com:HeroDigital/renditions-servlet.git</connection>
         <developerConnection>scm:git:ssh://git@github.com:HeroDigital/renditions-servlet.git</developerConnection>
         <url>https://github.com/HeroDigital/renditions-servlet</url>
     </scm>
