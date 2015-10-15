@@ -9,7 +9,7 @@ servlet which can be used to request DAM image renditions in a prioritized manne
 Special "original" rendition can also be retrieved. However, it is only returned if specifically queried or in the case
 that `rendition.servlet.redirect.on.missing.rendition` functionality is enabled.
 
-## Documentaton
+## Documentation
 
 Supported Extensions: jpg, jpeg, png, svg, gif
 
