@@ -22,6 +22,7 @@ import org.apache.felix.scr.annotations.Service;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
 import org.apache.sling.api.resource.Resource;
+import org.apache.sling.api.resource.ValueMap;
 import org.apache.sling.api.servlets.SlingSafeMethodsServlet;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -63,6 +64,8 @@ public class ImageRenditionServlet extends SlingSafeMethodsServlet {
 	protected static final String SELECTOR_RENDITION_THUMB = "imgt";
 	protected static final String SELECTOR_RENDITION_ORIGINAL = "imgo";
 	
+	protected static final String FILE_REFERENCE = "fileReference";
+	
 	private static enum Selector { TYPE, WIDTH, HEIGHT } // used for ordinal position of selectors
 	
 	@Property(label = "Redirect On Unsupported Type", description = "Enabled by default. If request is made to a rendition with the wrong extension, a 302 redirect is returned the the URL with the matching extension. If disabled, then 415 error response is returned.", boolValue = true)
@@ -102,8 +105,11 @@ public class ImageRenditionServlet extends SlingSafeMethodsServlet {
 			return;
 		}
 		
-		// Adapt image resource to dam object
+		// Adapt image resource to dam object, supports node with fileReference to image
 		Asset damAsset = resource.adaptTo(Asset.class);
+		if (damAsset == null) {
+			damAsset = extractAssetFromFileReference(resource);
+		}
 		if (damAsset == null) {
 			log.debug("Cannot resolve dam asset at {} for {}", resource.getPath(), request.getPathInfo());
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -210,6 +216,22 @@ public class ImageRenditionServlet extends SlingSafeMethodsServlet {
 		
 		log.warn("Requested {}, however, mime type of rendition is {}. Redirecting to {}", requestURL, rendition.getMimeType(), redirect);
 		response.sendRedirect(redirect);
+	}
+	
+	private static Asset extractAssetFromFileReference(Resource resource) {
+		if (resource == null) return null;
+		
+		ValueMap valueMap = resource.adaptTo(ValueMap.class);
+		if (valueMap != null) {
+			String fileReference = valueMap.get(FILE_REFERENCE, String.class);
+			if (fileReference != null) {
+				Resource candidateResource = resource.getResourceResolver().getResource(fileReference);
+				if (candidateResource != null) {
+					return candidateResource.adaptTo(Asset.class);
+				}
+			}
+		}
+		return null;
 	}
 	
 	private static String getExtension(String mimeType) throws IOException {
