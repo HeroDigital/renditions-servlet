@@ -23,7 +23,7 @@
         <sling.refreshPackages>true</sling.refreshPackages>
 
     </properties>
-    
+
     <scm>
         <connection>scm:git:git@github.com:HeroDigital/renditions-servlet.git</connection>
         <developerConnection>scm:git:git@github.com:HeroDigital/renditions-servlet.git</developerConnection>
@@ -34,9 +34,9 @@
     <distributionManagement>
         <repository>
             <uniqueVersion>false</uniqueVersion>
-            <id>hero-releases</id>
+            <id>hero-public</id>
             <name>Hero Repository</name>
-            <url>https://build.herodigital.com:8081/nexus/content/repositories/releases/</url>
+            <url>https://build.herodigital.com:8081/nexus/content/repositories/herodigital-public/</url>
             <layout>default</layout>
         </repository>
         <snapshotRepository>
@@ -134,7 +134,7 @@
 			<version>2.4</version>
 			<scope>provided</scope>
 		</dependency>
-        
+
         <!-- COMPILE TIME DEPENDENCIES -->
 
     </dependencies>
@@ -155,7 +155,7 @@
                     </instructions>
                 </configuration>
             </plugin>
-        </plugins>        
+        </plugins>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -171,7 +171,7 @@
                     <artifactId>maven-bundle-plugin</artifactId>
                     <version>2.5.4</version>
                     <executions>
-                        <!-- 
+                        <!--
                             There seems to be an issue with this plugin where `mvn release:perform` will end up deploying to nexus twice.
                             Once during the install phase and again on the deploy phase. Workaround is to prevent this plugin
                             from running during the deploy phase.
