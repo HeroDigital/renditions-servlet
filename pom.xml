@@ -5,7 +5,7 @@
 
     <groupId>com.herodigital.wcm</groupId>
     <artifactId>renditions-servlet</artifactId>
-    <version>1.0.5-SNAPSHOT</version>
+    <version>1.0.5</version>
     <packaging>bundle</packaging>
 
     <name>AEM Renditions Servlet</name>
@@ -28,7 +28,7 @@
         <connection>scm:git:git@github.com:HeroDigital/renditions-servlet.git</connection>
         <developerConnection>scm:git:git@github.com:HeroDigital/renditions-servlet.git</developerConnection>
         <url>https://github.com/HeroDigital/renditions-servlet</url>
-      <tag>HEAD</tag>
+      <tag>renditions-servlet-1.0.5</tag>
   </scm>
 
     <distributionManagement>
